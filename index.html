@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WatchNow</title>
+    <title>InstantPlayer</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -74,7 +74,7 @@
 <body>
 
 <div class="container">
-    <h1>WatchNow</h1>
+    <h1>InstantPlayer</h1>
     
     <label for="type">Select Type:</label>
     <select id="type">
@@ -82,8 +82,8 @@
         <option value="tvshow">TV Show</option>
     </select>
 
-    <label for="id">ID:</label>
-    <input type="text" id="id" placeholder="Enter ID" required>
+    <label for="id">ID or IMDb Link:</label>
+    <input type="text" id="id" placeholder="Enter ID or IMDb Link" required>
 
     <div id="tv-show-options" style="display: none;">
         <label for="season">Season:</label>
@@ -93,13 +93,13 @@
         <input type="number" id="episode" placeholder="Enter Episode" required>
     </div>
 
-    <button onclick="updateEmbed()">Update Embed</button>
+    <button onclick="updateEmbed()">Watch Now</button>
 
     <iframe id="embed-frame" src="" allowfullscreen></iframe>
 
     <ul class="info">
-        <li>To embed a movie, select "Movie" and enter the ID.</li>
-        <li>To embed a TV show, select "TV Show", enter the ID, season, and episode.</li>
+        <li>To embed a movie, select "Movie" and enter the ID or IMDb link.</li>
+        <li>To embed a TV show, select "TV Show", enter the ID or IMDb link, season, and episode.</li>
         <li>Click "Update Embed" to see the video.</li>
     </ul>
 </div>
@@ -117,9 +117,22 @@
     });
 
     function updateEmbed() {
-        const id = document.getElementById('id').value;
+        const input = document.getElementById('id').value;
+        let id = '';
         let embedUrl = '';
 
+        // Regular expression to match IMDb URL and extract the ID
+        const imdbRegex = /\/title\/(tt\d+)/;
+
+        // Check if the input is an IMDb link
+        const match = input.match(imdbRegex);
+        if (match && match[1]) {
+            id = match[1]; // Extract the ID from the IMDb link
+        } else {
+            id = input; // Otherwise, assume it's a plain ID
+        }
+
+        // Construct the embed URL based on the selected type
         if (typeSelect.value === 'movie') {
             embedUrl = `https://www.2embed.cc/embed/${id}`;
         } else {
@@ -127,6 +140,8 @@
             const episode = document.getElementById('episode').value;
             embedUrl = `https://www.2embed.cc/embedtv/${id}&s=${season}&e=${episode}`;
         }
+
+        // Set the iframe source to the constructed embed URL
         document.getElementById('embed-frame').src = embedUrl;
     }
 </script>
